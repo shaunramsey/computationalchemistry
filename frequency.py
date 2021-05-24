@@ -1,4 +1,5 @@
 # created by Shaun D Ramsey - 2021 
+# version 05.24.21 includes linking to logger.py for better log file control
 # version 05.13.21 includes parsing of geom data and output to file
 # licensed under the MIT license - an example of which is: https://opensource.org/licenses/MIT
 
