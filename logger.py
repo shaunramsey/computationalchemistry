@@ -1,5 +1,5 @@
 # created by Shaun D Ramsey - 2021 
-# version 05.13.21  - class singleton creation for use with log, log_open and log_close
+# version 05.24.21  - class singleton creation for use with log, log_open and log_close
 #                   - this log_setup also controls the verbosity 
 # licensed under the MIT license - an example of which is: https://opensource.org/licenses/MIT
 
