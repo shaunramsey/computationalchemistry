@@ -1,4 +1,5 @@
 # created by Shaun D Ramsey - 2021 
+# TODO 05.24.21 - include logger.py support for better logging.
 # version 05.13.21 includes parsing of geom data and output to file
 # licensed under the MIT license - an example of which is: https://opensource.org/licenses/MIT
 
