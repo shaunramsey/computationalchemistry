@@ -1,5 +1,5 @@
 # created by Shaun D Ramsey - 2021 
-# version 05.24.21 includes linking to logger.py for better log file control
+# version 06.11.21 the output filename can be tied to the input file name
 # version 05.13.21 includes parsing of geom data and output to file
 # licensed under the MIT license - an example of which is: https://opensource.org/licenses/MIT
 
@@ -24,11 +24,10 @@ import sys
 import re
 import datetime
 from logger import log, log_close, log_setup, LogSingleton
-import tkinter as tk
-from tkinter import filedialog
 
 
-GUI = True
+DEFAULT_FILENAME_EXTENSION = ".csv"
+GUI = False
 program_name = "Frequency/Intensity CSV"
 
 def main_program():
@@ -39,21 +38,29 @@ def main_program():
     log(' **************************************** ')
     log(f" Welcome to {program_name}")
     log(' To use this program use: ')
-    log(' frequency [optfile.log] [outputfile.txt]')
-    log(' Both inputs are required ')
+    log(' ****frequency [optfile.log] -o <outputfile.txt>')
+    log('   [] is required <> is optional ', 1)
     log(' Current DEBUG/VERBOSITY LEVEL: ' + str(LogSingleton().VERBOSITY), 2)
-    log(' **************************************** ')
-
-    if len(sys.argv) < 3:
-        log(" [*] Error, expected three arguments", 0)
+    if len(sys.argv) < 2:
+        log("    [*] Error, expected at least one arguments", 0)
         sys.exit(1)
+    log(' **************************************** ', 1)
 
-    log( f" [BGN] OUTPUT TO \"{sys.argv[2]}\" BEGINS ", 1)
+   
+    output_file = sys.argv[1]
+    x = output_file.rfind(".")
+    output_file = output_file[:x] + DEFAULT_FILENAME_EXTENSION
+    if len(sys.argv) == 4:
+        output_file = sys.argv[3]
+    if output_file == sys.argv[1]: #a little sanity check
+        output_file = "(output)" + output_file
+
+    log( f" [BGN] OUTPUT TO \"{output_file}\" BEGINS ", 1)
 
 
 
     input_file = sys.argv[1]
-    output_file = sys.argv[2]
+  
     if GUI:
         input_file = inputFilename.get()
         output_file = outputFilename.get()
@@ -90,7 +97,7 @@ def main_program():
 
     of.close()
 
-    log( f" [END] OUTPUT TO \"{sys.argv[2]}\" COMPLETE ", 1)
+    log( f" [END] OUTPUT TO \"{output_file}\" COMPLETE ", 1)
     log( f" [END] Closing \"{program_name}\".", 1)
     log(' **************************************** ', 1)
 
@@ -98,6 +105,8 @@ def main_program():
 
 
 if GUI:
+    import tkinter as tk
+    from tkinter import filedialog
     root = tk.Tk()
     root.geometry("400x250")
     root.title("Frequency Correlation")
@@ -120,7 +129,7 @@ if GUI:
     outputFilename = tk.StringVar()
     outputFilename.set("freq.csv")
     if len(sys.argv) > 2:
-        outputFilename.set(sys.argv[2])
+        outputFilename.set(sys.argv[3])
 
     outputEntry = tk.Entry(textvariable=outputFilename)
     outputEntry.grid(row=2, column=2)

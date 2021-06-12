@@ -1,5 +1,5 @@
 # created by Shaun D Ramsey - 2021 
-# TODO 05.24.21 - include logger.py support for better logging.
+# version 06.11.21 the output filename can be tied to the input file name, imported logger unifying with frequency.py
 # version 05.13.21 includes parsing of geom data and output to file
 # licensed under the MIT license - an example of which is: https://opensource.org/licenses/MIT
 
@@ -22,67 +22,45 @@
 
 import sys #needed for argv
 from datetime import date
+from logger import log, log_close, log_setup, LogSingleton
 
-#sets the verbosity level for the program, 0 is OFF, 9 is fully verbose/debug
-# 0 only errors print generally
-# 1 normal verbosity
-# 2 lowest level of debug - debug items generally print once
-# 5 middle level - status updates in loops and the like
-# 9 SHOW ME EVERY DEBUG EVER!
-# if you want logs to go to a file, change LOGFILE to True
-LOGFILE = True
-VERBOSITY = 1
+
 program_name = "Geometry Output"
+DEFAULT_FILENAME_EXTENSION = ".txt"
 
-today = date.today()
-LOGFILENAME = "geometryinput"
-LOGFILE_OBJ = None
-d1 = today.strftime("%d%m%Y")
-FULL_LOGFILENAME = LOGFILENAME + d1 + ".log"
-
-
-
-def log(msg, level):  
-    if VERBOSITY >= level:
-        if level > 1:
-            msg = f' [{level}]: {msg}'
-        elif level == 0:
-            msg = f" [ERROR]: {msg}"
-
-    if VERBOSITY >= level:
-        print(msg)
-    if LOGFILE:
-        if LOGFILE_OBJ:
-            LOGFILE_OBJ.write(f"[{level}]: {msg}\n")
-        else:
-            log(" Something went wrong with the log file", 0)
-
-if LOGFILE: #open file for logging
-    LOGFILE_OBJ = open(FULL_LOGFILENAME,"a")
-    log(f' ** RUN BEGINS **', 999)
-    log(f' OPENING LOGFILE "{FULL_LOGFILENAME}"', 2)
+log_setup("geometryinput")
     
    
 
 log(' **************************************** ', 1)
 log(f" Welcome to {program_name}", 1)
-log(' Input is expected to be an opt file, extension .log', 1)
-log(" Output is expected to be a generic txt file intended to go in a .com", 1)
-log(' You may use any extensions for these files in your execution.', 1)
+log('   Input is expected to be an opt file, extension .log', 1)
+log("   Output is expected to be a generic txt file intended to go in a .com", 1)
+log('   You may use any extensions for these files in your execution.', 1)
 log(' To run this command use: ', 1)
-log(' geometryinput [optfile.log] [outputfile.txt]', 1)
-log(' Both inputs are required ', 1)
-log(' Current DEBUG/VERBOSITY LEVEL: ' + str(VERBOSITY), 2)
-if len(sys.argv) < 3:
-    log(" [*] Error, expected three arguments", 0)
+log(' **** python3 geometryinput.py [optfile.log] -o <outputfile.txt>', 1)
+log('   [] is required <> is optional ', 1)
+log(' Current DEBUG/VERBOSITY LEVEL: ' + str(LogSingleton().VERBOSITY), 2)
+if len(sys.argv) < 2:
+    log("    [*] Error, expected at least two arguments", 0)
     sys.exit(1)
 log(' **************************************** ', 1)
-log( f" [BGN] OUTPUT TO \"{sys.argv[2]}\" BEGINS ", 1)
+
+outputfilename = sys.argv[1]
+x = outputfilename.rfind(".")
+outputfilename = outputfilename[:x] + DEFAULT_FILENAME_EXTENSION
+if outputfilename == sys.argv[1]: #a little sanity check
+    outputfilename = "(output)" + outputfilename
+    
+if len(sys.argv) == 4:
+    outputfilename = sys.argv[3]
+
+log( f" [BGN] OUTPUT TO \"{outputfilename}\" BEGINS ", 1)
 # go ahead read in the file
 with open(sys.argv[1], 'r') as readfile:
     read_data = readfile.read()
 
-output_file = open(sys.argv[2], 'w')
+output_file = open(outputfilename, 'w')
 
 #\\ is actually an escape code for backslash..tricky
 #find the \\Version bits
@@ -145,12 +123,8 @@ while idx != -1 and idx < len(data):
 
 
 output_file.close()
-log( f" [END] OUTPUT TO \"{sys.argv[2]}\" COMPLETE ", 1)
+log( f" [END] OUTPUT TO \"{outputfilename}\" COMPLETE ", 1)
 log( f" [END] Closing \"{program_name}\".", 1)
 log(' **************************************** ', 1)
 
-
-if LOGFILE:
-    log(' CLOSING LOGFILE ', 2)
-    log(' RUN ENDS \n', 999)
-    LOGFILE_OBJ.close()
+log_close()
