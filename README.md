@@ -13,6 +13,7 @@ Example executions:
 python3 frequency.py Freq_ex1.log
 
 and
+
 python3 geometryinput.py Opt_ex1.log
 
 
